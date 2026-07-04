@@ -77,6 +77,36 @@ describe("victron-dbus-virtual, setValuesLocally", () => {
 
   });
 
+  it("supports unsigned int values", async () => {
+    const declaration = { name: "foo", properties: { UtcTime: { type: "u" } } };
+    const definition = { UtcTime: 0 };
+    const bus = {
+      exportInterface: jest.fn(),
+    };
+
+    const { setValuesLocally } = addVictronInterfaces(bus, declaration, definition, false);
+
+    expect(() => {
+      setValuesLocally({ UtcTime: 63252000 });
+    }).not.toThrow();
+
+    expect(definition.UtcTime).toBe(63252000);
+  });
+
+  it("rejects negative unsigned int values", async () => {
+    const declaration = { name: "foo", properties: { UtcTime: { type: "u" } } };
+    const definition = { UtcTime: 0 };
+    const bus = {
+      exportInterface: jest.fn(),
+    };
+
+    const { setValuesLocally } = addVictronInterfaces(bus, declaration, definition, false);
+
+    expect(() => {
+      setValuesLocally({ UtcTime: -1 });
+    }).toThrow("out of range for unsigned int");
+  });
+
   it("trying to set readonly properties fails, without changing anything", () => {
     const declaration = { name: "foo", properties: { ReadOnlyProp: { type: "s", readonly: true }, WritableProp: "s" } };
     const definition = { ReadOnlyProp: "original", WritableProp: "original" };

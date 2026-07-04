@@ -102,6 +102,8 @@ function unwrapValue([t, v]) {
       return v[0];
     case "i":
       return Number(v[0]);
+    case "u":
+      return Number(v[0]);
     case "d":
       return Number(v[0]);
     case "ad":
@@ -153,13 +155,18 @@ function validateNewNumber(name, declaration, value) {
   if (isNaN(number)) {
     throw new Error(`value for ${name} is not a number.`);
   }
+  if (declaration.type === "u") {
+    if (!Number.isFinite(number) || number < 0 || number > 0xFFFFFFFF) {
+      throw new Error(`value for ${name} is out of range for unsigned int`);
+    }
+  }
   if (declaration.max !== undefined && number > declaration.max) {
     throw new Error(`value for ${name} is too large`);
   }
   if (declaration.min !== undefined && number < declaration.min) {
     throw new Error(`value for ${name} is too small`);
   }
-  if (declaration.type === "i") {
+  if (declaration.type === "i" || declaration.type === "u") {
     return Math.floor(number);
   } else {
     return number;
@@ -190,6 +197,7 @@ function validateNewValue(name, declaration, value) {
         }
         throw new Error(`validation failed for ${name}, type ${declaration.type}, check logs for details.`)
       case 'i':
+      case 'u':
       case 'd':
         if (Array.isArray(value) && value.length > 0) {
           throw new Error(`value for ${name} cannot be an array`);

@@ -5,6 +5,7 @@ describe("victron-dbus-virtual, unwrapValue", () => {
   it("works for basic types", () => {
     expect(unwrapValue([[{ type: "s" }], ["hello"]])).toBe("hello");
     expect(unwrapValue([[{ type: "i" }], [42]])).toBe(42);
+    expect(unwrapValue([[{ type: "u" }], [86400000]])).toBe(86400000);
     expect(unwrapValue([[{ type: "d" }], [42.1]])).toBe(42.1);
     expect(unwrapValue([[{ type: "b" }], [42]])).toBe(true);
     expect(unwrapValue([[{ type: "ad" }], [[42.1, 42.2]]])).toStrictEqual([42.1, 42.2]);
